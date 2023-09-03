@@ -67,7 +67,7 @@ def make_card_pack(role: 'Roles', reverse_order: bool = False):
         else:
             temp = make_card(i)
             if (i.index == role.card_pack_instance[role.card_use_index].index 
-                or (role.card_pack_instance[role.card_use_index].fast_card 
+                or ((role.card_pack_instance[role.card_use_index].fast_card or role.all_fast_card)
                     and i.index == role.card_pack_instance[(role.card_use_index + 1) % len(role.card_pack_instance)].index)):
                 blank = Image.new("RGBA", (temp.size[0], temp.size[1] // 5), (0,0,0,0))
                 if reverse_order:
