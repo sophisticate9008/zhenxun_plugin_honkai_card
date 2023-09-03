@@ -112,10 +112,11 @@ async def _(bot:Bot, event: GroupMessageEvent):
             group_hook[group][0]["block"] = True
             try:
                 async_list = [jishiqi(group), sel_card(group_hook[group][0], bot, event), fighting(bot, event)]
+                await asyncio.gather(*async_list)
             except:
                 await honkai_card.send("未及时配置，取消操作")
                 group_hook[group] = {}
-            await asyncio.gather(*async_list)
+            
 
 async def fighting(bot:Bot, event:GroupMessageEvent):
     global group_hook
