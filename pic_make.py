@@ -6,12 +6,12 @@ if TYPE_CHECKING:
     from .Roles import Roles
 import copy
 
-def make_card_sel(card_list: List['Cards']):
+def make_card_sel(card_list: List['Cards'], num: int):
     pic_row_list: List[Image.Image] = []
     pic = Image.new('RGBA',(0,0))
     for idx, i in enumerate(card_list):
         pic = append_images(pic,make_card(i),0,0)
-        if (idx + 1) % 3 == 0:
+        if (idx + 1) % num == 0:
             pic_row_list.append(copy.deepcopy(pic))
             pic = Image.new('RGBA',(0,0))
     

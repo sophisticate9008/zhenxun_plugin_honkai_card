@@ -45,13 +45,23 @@ async def sel_card(my_dict, bot: 'Bot', event: 'GroupMessageEvent'):
             order += 1
             card_instance_list.append(Cards(None, card_name, order, card_level))
     
-    pic = pic2b64(make_card_sel(card_instance_list), 25)
+    pic = pic2b64(make_card_sel(card_instance_list, 6), 25)
     await push_image(bot, event, pic)
-    await bot.send(event,"选择卡牌一行选择一个 例如(01110022),不满足条件不响应",at_sender=True)
+    await bot.send(event,"选择卡牌每三个选择一个例如(01110022),不满足条件不响应",at_sender=True)
     response = await get_answer(my_dict,3, 8)
     for idx, i in enumerate(response):
         sel_card_pack.append(card_pack_list[idx][int(i)])
     
+    card_instance_list = []
+    for i in sel_card_pack:
+        temp = i.split("_")
+        card_name = temp[0]
+        card_level = int(temp[1])
+        order += 1
+        card_instance_list.append(Cards(None, card_name, order, card_level))
+    
+    pic = pic2b64(make_card_sel(card_instance_list, 4), 25)  
+    await push_image(bot, event, pic)    
     await bot.send(event,"接下来对卡牌进行排序 例如(01234567)")
     condition = True
     result = []
