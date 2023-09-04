@@ -196,15 +196,10 @@ class Roles:
 
 
     def turn_end(self):
-        
         enemy = self.process.role_list[(self.role_index + 1) % 2]
-        if not self.harm_to_life_next:
-    
-            self.harm_to_life -= 1 if self.harm_to_life > 0 else 0   #伤害转治疗回合-1
         enemy.bleed += self.push_bleed  #魔阵的对敌方流血生效
         self.push_bleed = 0 #
-        
-        
+
         self.weak -= 1 if self.weak > 0 else 0
         self.easy_hurt -= 1 if self.easy_hurt > 0 else 0
         

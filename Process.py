@@ -74,6 +74,8 @@ class Process:
                     self.role_list[i].logs += "敌方效果&\n回合结算:\n"
                 else:
                     self.role_list[i].logs += "回合结算:\n"
+                if not self.role_list[i].harm_to_life_next:
+                    self.self.role_list[i] -= 1 if self.self.role_list[i] > 0 else 0   #伤害转治疗回合-1
                 self.role_list[i].cal_life()
                 self.role_list[i].track_go()
                 self.role_list[i].log_handle()
