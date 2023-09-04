@@ -792,7 +792,7 @@ class Cards:
             self.color = color
             self.mana = 2
             self.describe = f"2伤害*{3 + level}"
-            
+    
             def use(self_):
                 role.attack += 2 * (3 + level)
                 role.attack_count += 2 * (3 + level)                
@@ -803,7 +803,7 @@ class Cards:
             
             def use(self_):
                 role.shield += (4 + 4 * level) * 30
-                role.note += (4 + 4 * level) if (4 + 4 * level) > role.mana else role.mana
+                role.note += (4 + 4 * level) if (4 + 4 * level) < role.mana else role.mana
             
             
         self.use = use.__get__(self)
