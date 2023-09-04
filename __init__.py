@@ -124,7 +124,10 @@ async def fighting(bot:Bot, event:GroupMessageEvent):
     while group_hook.get(group):
         if group_hook[group].get(1) and not group_hook[group][1]["block"]:
             await bot.send(event, "双方就绪,开始战斗")
-            result = imitate(group_hook[group])
+            try:
+                result = imitate(group_hook[group])
+            except Exception as e:
+                await bot.send(event, f"模拟过程出错,{e}")
             await bot.send(event, f"{result['winner']}\n{result['0'].role_name}\n{result['1'].role_name}\n总伤害:{result['0'].sum_harm}\n总伤害:{result['1'].sum_harm}")
             record_harm(group, group_hook[group][0]["uid"], result["0"].sum_harm)
             record_harm(group, group_hook[group][1]["uid"], result["1"].sum_harm)
@@ -137,7 +140,10 @@ async def fighting(bot:Bot, event:GroupMessageEvent):
 
         elif group_hook[group]["sys_random"]:
             await bot.send(event,"无人应战,将开始人机对战")
-            result = imitate(group_hook[group], sys_random=True)
+            try:
+                result = imitate(group_hook[group],sys_random=True)
+            except Exception as e:
+                await bot.send(event, f"模拟过程出错,{e}")
             await bot.send(event, f"{result['winner']}\n{result['0'].role_name}\n{result['1'].role_name}\n总伤害:{result['0'].sum_harm}\n总伤害:{result['1'].sum_harm}")
             record_harm(group, group_hook[group][0]["uid"], result["0"].sum_harm)
             msg_list = [image(pic) for pic in result["pics"]]

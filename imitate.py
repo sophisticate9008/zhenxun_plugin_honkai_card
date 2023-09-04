@@ -62,7 +62,8 @@ async def sel_card(my_dict, bot: 'Bot', event: 'GroupMessageEvent'):
             if i not in "01234567":
                 condition = True
                 await bot.send(event, "不满足条件请重新输入", at_sender=True)
-                continue
+                break
+
     for i in response:
         result.append(sel_card_pack[int(i)])
     await bot.send(event, "配置完毕")
