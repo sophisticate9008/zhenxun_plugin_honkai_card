@@ -576,8 +576,8 @@ class Cards:
                 role.again = True
                 if level != 1:
                     role.card_accumulate += 1
-                    role.accumulate_list.append(f"20 > attack > {-50 + level * 50} > 20 > #A21911")
-                    role.accumulate_list.append(f"20 > attack_count > 1 > 20 > none")
+                    role.accumulate_list.append(f"20 > attack > {-50 + level * 50} > 20 > #A21911 > 1")
+                    role.accumulate_list.append(f"20 > attack_count > 1 > 20 > none > 1")
                     
         if card_name == "乐符狂热":
             self.describe = f"乐符+{5 + 5 * level} 积蓄(5)获得等于乐符数量{0.5 + 0.5 * level}倍的力量"
@@ -586,7 +586,7 @@ class Cards:
             def use(self_):
                 role.card_accumulate += 1
                 role.note += 5 + 5 * level
-                role.accumulate_list.append(f"5 > power > self.note * {0.5 + 0.5 * level} > 5 > #B47EC6")
+                role.accumulate_list.append(f"5 > power > self.note * {0.5 + 0.5 * level} > 5 > #B47EC6 > 1")
                 
         if card_name == "音律强击":
             self.color = color
@@ -634,8 +634,8 @@ class Cards:
             
             def use(self_):
                 role.card_accumulate += 1
-                role.accumulate_list.append(f"10 > attack > {20 + 5 * level} > 10 > #E7B77B")
-                role.accumulate_list.append(f"10 > attack_count > 1 > 10 > none")
+                role.accumulate_list.append(f"10 > attack > {20 + 5 * level} > 10 > #E7B77B > 1")
+                role.accumulate_list.append(f"10 > attack_count > 1 > 10 > none > 1")
         
         if card_name == "速攻.贮力":
             self.color = color 
@@ -651,7 +651,7 @@ class Cards:
             
             def use(self_):
                 role.card_accumulate += 1
-                role.accumulate_list.append(f"5 > note > {15 + 5 * level} > 5 > #D54582")
+                role.accumulate_list.append(f"5 > note > {15 + 5 * level} > 5 > #D54582 > 1")
                 
         if card_name == "额外音符":
             self.color = color 
@@ -714,8 +714,8 @@ class Cards:
             
             def use(self_):
                 role.card_accumulate += 1
-                role.accumulate_list.append(f"8 > attack > {15 + 5 * level} > 8 > #669592")
-                role.accumulate_list.append(f"8 > attack_count > 1 > 8 > none")
+                role.accumulate_list.append(f"8 > attack > {15 + 5 * level} > 8 > #669592 > 1")
+                role.accumulate_list.append(f"8 > attack_count > 1 > 8 > none > 1")
                 
         if card_name == "威势.集力":
             self.color = color
@@ -724,7 +724,7 @@ class Cards:
             def use(self_):
                 role.card_accumulate += 1
                 role.mana += 3 + level
-                role.accumulate_list.append(f"7 > life_recover > {2 + level * 3} > 7 > #8EBF78")
+                role.accumulate_list.append(f"7 > life_recover > {2 + level * 3} > 7 > #8EBF78 > 1")
                 
         if card_name == "瞬袭.集力":
             self.mana = 2
@@ -750,8 +750,8 @@ class Cards:
             def use(self_):
                 role.card_accumulate += 1
                 role.note += 1 + 2 * level
-                role.accumulate_list.append(f"5 > attack > {4 + level} > 5 > #62A8F1")
-                role.accumulate_list.append(f"5 > attack_count > {4 + level} > 5 > none")
+                role.accumulate_list.append(f"5 > attack > {4 + level} > 5 > #62A8F1 > 1")
+                role.accumulate_list.append(f"5 > attack_count > {4 + level} > 5 > none > 1")
         
         if card_name == "音符预演":
             self.color = color 

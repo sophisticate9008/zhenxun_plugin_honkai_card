@@ -3,8 +3,11 @@ import time
 
 from typing import Tuple, Dict, Optional, Union, Callable,NewType, TYPE_CHECKING, List
 import random
+
+from .pic_make import make_card
 if TYPE_CHECKING:
     from .Process import Process
+    from PIL import Image
 from .Cards import Cards
 import math
 exclude_types = (dict, list, tuple)
@@ -71,6 +74,7 @@ class Roles:
         self.role_name = role_name
         self.process = process
         self.card_pack_instance_backup: List[Cards] = []
+        self.card_pic_pool: List['Image.Image'] = []
         self.name_args: Dict[str, str] = {"shield":"护盾", "power": "力量", "mana": "法力", "coin":"幸运币", 
                                           "heal":"自愈", "bleed": "流血", "weak": "虚弱", "easy_hurt": "易伤",
                                           "note": "乐符"}
@@ -93,7 +97,7 @@ class Roles:
             order += 1
         self.get_attr_now()
         self.get_attr_backup()
-            
+        self.make_card_pool()            
 
        
     def record_state(self):
@@ -407,7 +411,10 @@ class Roles:
             self.shield += 5 * 30
             self.life_now += 15 * 30
             self.life_max += 15 * 30
-
+    def make_card_pool(self):
+        self.card_pic_pool = [make_card(i) for i in self.card_pack_instance_backup]
+            
+            
 def merge_strings(strings):
     merged_dict = defaultdict(float)  # 使用默认工厂函数为float
 

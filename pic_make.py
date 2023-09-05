@@ -58,16 +58,17 @@ def make_card_pack(role: 'Roles', reverse_order: bool = False):
     
     
     card_pack_to_iterate = role.card_pack_instance_backup
+    card_pics = role.card_pic_pool
     if reverse_order:
         card_pack_to_iterate = reversed(card_pack_to_iterate)
-    
-    for i in card_pack_to_iterate:
+        card_pics = list(reversed(card_pics))
+    for idx, i in enumerate(card_pack_to_iterate):
         if i.index not in have_card_list:
-            card_pic_list.append(make_card(i, mask=True))
+            card_pic_list.append(apply_transparent_mask(copy.deepcopy(card_pics[idx]), (0,0,0,128)))
         else:
-            temp = make_card(i)
+            temp = copy.deepcopy(card_pics[idx])
             if (i.index == role.card_pack_instance[role.card_use_index].index 
-                or ((role.card_pack_instance[role.card_use_index].fast_card or role.all_fast_card)
+                or (role.card_pack_instance[role.card_use_index].fast_card 
                     and i.index == role.card_pack_instance[(role.card_use_index + 1) % len(role.card_pack_instance)].index)):
                 blank = Image.new("RGBA", (temp.size[0], temp.size[1] // 5), (0,0,0,0))
                 if reverse_order:
