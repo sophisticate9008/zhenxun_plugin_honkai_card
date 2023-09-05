@@ -77,6 +77,7 @@ class Process:
                     self.role_list[i].logs += "回合结算:\n"
                 if not self.role_list[i].harm_to_life_next:
                     self.role_list[i].harm_to_life -= 1 if self.role_list[i].harm_to_life > 0 else 0   #伤害转治疗回合-1
+                self.role_list[i].sum_harm += self.role_list[i].harm
                 self.role_list[i].cal_life()
                 self.role_list[i].track_go()
                 self.role_list[i].log_handle()
