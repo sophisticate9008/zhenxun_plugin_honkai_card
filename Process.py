@@ -99,6 +99,13 @@ class Process:
                 pic_list.append(pic2b64(result, 50))
                 result.close()
                 result = Image.new("RGBA", (0,0))
+            elif idx == len(self.pic_list) - 1:
+                result = convert_png_to_jpg_with_lower_quality(result, 1)
+                pic_list.append(pic2b64(result, 50))
+                result.close()
+                result = Image.new("RGBA", (0,0))
+                
+            
 
             
         return {
