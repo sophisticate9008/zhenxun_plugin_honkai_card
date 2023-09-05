@@ -99,7 +99,7 @@ def append_accumulate_show(pic: Image.Image, process: 'Process'):
         width = 24
         border_x = 3
         broder_y = 3
-        height = 24
+        height = 36
         if i == 0:
             start_x = 150
             start_y = 420
@@ -116,15 +116,16 @@ def append_accumulate_show(pic: Image.Image, process: 'Process'):
             temp = j.replace(" ","").split(">")
             count_now = temp[3]
             color = temp[4]
+            accu_num = str(int(float(temp[5])))
             if color != 'none':
                 count += 1
                 if i == 0:
                     pic = apply_transparent_mask(pic, color, [(x, y, x + width, y + height)])
-                    pic = add_colored_text_to_image(pic, count_now, (x, y), (x + width, y + height), 15, yuanshen_ttf)
+                    pic = add_colored_text_to_image(pic, count_now + "\n" + accu_num, (x, y), (x + width, y + height), 15, yuanshen_ttf)
                     x += width + border_x
                 else:
                     pic = apply_transparent_mask(pic, color, [(x - width, y, x, y + height)])
-                    pic = add_colored_text_to_image(pic, count_now, (x - width, y), (x, y + height), 15, yuanshen_ttf)
+                    pic = add_colored_text_to_image(pic, count_now + "\n" + accu_num, (x - width, y), (x, y + height), 15, yuanshen_ttf)
                     x -= width + border_x
                 if count % line_count == 0:
                     x = start_x

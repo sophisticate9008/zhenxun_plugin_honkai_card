@@ -1,4 +1,6 @@
+from collections import defaultdict
 import time
+
 from typing import Tuple, Dict, Optional, Union, Callable,NewType, TYPE_CHECKING, List
 import random
 if TYPE_CHECKING:
@@ -126,6 +128,11 @@ class Roles:
         }
         self.attr_now = attr_now
 
+    
+    def merge_track(self):
+        if self.turn_count == 9:
+            self.track_list = merge_strings(self.track_list)
+                
 
     def track_go(self):
         self.get_attr_now()
@@ -148,7 +155,9 @@ class Roles:
                     if temp[1] in self.name_args:
                         if int(var_change) > 0:
                             self.logs += self.name_args[temp[1]] + " + " +  str(int(var_change)) + "\n"
-                    change_list.append(temp[0])
+                    change_list.append(temp[0])   
+            if len(change_list) == 0:
+                break
             for i in change_list:
                 self.attr_backup[i] = self.attr_now[i]
             self.get_attr_now()
@@ -175,6 +184,7 @@ class Roles:
     
     def turn_begin(self):
         
+        self.merge_track()
         if not self.rampart and self.turn_count != 1:
             self.shield = int(self.shield / 2)
             self.rampart -= 1 if self.rampart > 0 else 0
@@ -196,10 +206,13 @@ class Roles:
 
 
     def turn_end(self):
+        
         enemy = self.process.role_list[(self.role_index + 1) % 2]
-        enemy.bleed += self.push_bleed  #魔阵的对敌方流血生效
+        enemy.bleed += self.push_bleed
         self.push_bleed = 0 #
+          #魔阵的对敌方流血生效
 
+        
         self.weak -= 1 if self.weak > 0 else 0
         self.easy_hurt -= 1 if self.easy_hurt > 0 else 0
         
@@ -310,6 +323,9 @@ class Roles:
                 num += 1 
         return num   
 
+    def merge_accumulate(self):
+        self.accumulate_list = merge_strings(self.accumulate_list)
+    
     def get_accumulate_min(self):
         num_list = []
         for idx, i in enumerate(self.accumulate_list[:]):
@@ -319,32 +335,35 @@ class Roles:
         return min(num_list)
         
     
+    
     def accumulate_accelerate(self, accelerate_num = 1, effect_num = 1, no_limit = False, min = 0):
-        #20 > {name} > num > count_now > color
+        #20 > {name} > num > count_now > color > accu_num
         remove_list = []
-        for idx, i in enumerate(self.accumulate_list[:]):
+        for idx, i in enumerate(list(self.accumulate_list[:])):
             temp = i.replace(" ","").split(">")
             count_max = int(temp[0])
             attr_name = temp[1]
             num = eval(temp[2])
             count_now = int(temp[3])
             color = temp[4]
+            accu_num = int(float(temp[5]))
             if min != 0:
                 count_now = min
             else:
                 count_now -= count_now if count_now < accelerate_num else accelerate_num
             if count_now <= 0 or no_limit:
                 attr_value = getattr(self, attr_name)
-                attr_value += effect_num * num
+                attr_value += effect_num * num * accu_num
                 setattr(self, attr_name, attr_value)
                 if not no_limit:
                     if not self.again:
                         remove_list.append(i)
                     else:
-                        str_new = str(count_max) + " > " + attr_name + " > " + temp[2] + " > " + str(count_max) + " > " + color
+                        
+                        str_new = " > ".join([str(count_max), attr_name, temp[2], str(count_max), color, str(accu_num)])
                         self.accumulate_list[idx] = str_new
             else:
-                str_new = str(count_max) + " > " + attr_name + " > " + temp[2] + " > " + str(count_now) + " > " + color
+                str_new = str_new = " > ".join(map(str, [count_max, attr_name, temp[2], count_now, color, str(accu_num)]))
                 self.accumulate_list[idx] = str_new
         
         for i in remove_list:
@@ -388,4 +407,30 @@ class Roles:
             self.shield += 5 * 30
             self.life_now += 15 * 30
             self.life_max += 15 * 30
+
+def merge_strings(strings):
+    merged_dict = defaultdict(float)  # 使用默认工厂函数为float
+
+    for string in strings:
+        if ">" in string:
+            parts = string.split(" > ")
+            key = " > ".join(parts[:-1])
+            value = float(parts[-1])  # 解析为浮点数
+            merged_dict[key] += value
+        else:
+            parts = string.split(" < ")
+            key = " < ".join(parts[:-1])
+            value = float(parts[-1])  # 解析为浮点数
+            merged_dict[key] += value
+            
+    merged_strings = []
+    for key, value in merged_dict.items():
+        if ">" in key:
+            merged_strings.append(f"{key} > {value}")
+        else:
+            merged_strings.append(f"{key} < {value}")
+
+    return merged_strings
+
+
         

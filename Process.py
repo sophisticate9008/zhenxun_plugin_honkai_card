@@ -56,6 +56,7 @@ class Process:
                 role_enemy = self.role_list[(i + 1) % 2]
                 role_self.turn_count += 1
                 role_self.turn_begin()
+                role_self.merge_accumulate()
                 pic = append_accumulate_show(pic, self)
 
                 
