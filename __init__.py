@@ -110,12 +110,19 @@ async def _(bot:Bot, event: GroupMessageEvent):
             group_hook[group][0]["answer_id"] = 0
             group_hook[group][0]["answer"] = {}
             group_hook[group][0]["block"] = True
-            try:
-                async_list = [jishiqi(group), sel_card(group_hook[group][0], bot, event), fighting(bot, event)]
-                await asyncio.gather(*async_list)
-            except:
-                await honkai_card.send("未及时配置，取消操作")
-                group_hook[group] = {}
+        try:
+            task1 = asyncio.create_task(jishiqi(group))
+            task2 = asyncio.create_task(sel_card(group_hook[group][0], bot, event))
+            task3 = asyncio.create_task(fighting(bot, event))
+            
+            await asyncio.gather(task1, task2, task3)
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            task1.cancel()
+            task2.cancel()
+            task3.cancel()
+            await honkai_card.send("未及时配置，取消操作")
+            group_hook[group] = {}
             
 
 async def fighting(bot:Bot, event:GroupMessageEvent):
