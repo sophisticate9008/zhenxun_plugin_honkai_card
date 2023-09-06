@@ -351,7 +351,7 @@ class Cards:
         
         if card_name == "渴血.夜蝶":
             self.color = color
-            self.describe = f"流血对敌方造成伤害时,回复伤害值{10 * level + 15 + (5 if level == 3 else 0)}%的生命"   
+            self.describe = f"魔阵:流血对敌方造成伤害时,回复伤害值{10 * level + 15 + (5 if level == 3 else 0)}%的生命"   
             self.broken = True
             
             def use(self_):
