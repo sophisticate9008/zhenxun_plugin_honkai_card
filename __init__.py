@@ -230,17 +230,18 @@ async def _():
                 pass
     time_delay = random.randint(0, 3500)
     count = 0
-    while count > time_delay:
+    while count < time_delay:
         count += 1
         await asyncio.sleep(1)
-        try_count = 0
-        while try_count < 4:
-            try:
-                await AsyncHttpx.post(post_url, data=data_send)
-                break
-            except:
-                try_count += 1
-                await asyncio.sleep(10)
+        
+    try_count = 0
+    while try_count < 4:
+        try:
+            await AsyncHttpx.post(post_url, data=data_send)
+            break
+        except:
+            try_count += 1
+            await asyncio.sleep(10)
     
         
 
