@@ -94,10 +94,11 @@ async def _(bot:Bot, event: GroupMessageEvent):
             cloud_data = []
             for i in range(3):
                 try:
-                    cloud_data =  AsyncHttpx.get(get_url + "?n=50",timeout = 15).json()
+                    cloud_data =  await AsyncHttpx.get(get_url + "?n=50",timeout = 15).json()
+                    print(cloud_data)
                     break
                 except:
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(5)
             if len(cloud_data) == 0:
                 await honkai_card.finish("暂时无法获取云端排行")
             else:
@@ -235,10 +236,11 @@ async def _():
         await asyncio.sleep(1)
         
     try_count = 0
-    while try_count < 4:
+    while try_count < 6:
         try:
             if len(data_send) > 0:
                 await AsyncHttpx.post(post_url, data=data_send)
+                
             break
         except:
             try_count += 1
