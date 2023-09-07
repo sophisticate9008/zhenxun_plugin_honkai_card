@@ -1,4 +1,6 @@
 import asyncio
+import random
+from nonebot import get_bot
 from nonebot.adapters.onebot.v11 import (
     GROUP,
     Bot,
@@ -6,9 +8,11 @@ from nonebot.adapters.onebot.v11 import (
     Message,
     MessageSegment,
     )
+
+from utils.http_utils import AsyncHttpx
 from utils.message_builder import custom_forward_msg
 from nonebot_plugin_apscheduler import scheduler
-from utils.data_utils import init_rank
+from utils.data_utils import init_rank, _init_rank_graph
 from utils.utils import scheduler
 from nonebot import on_command,on_message
 from nonebot.adapters.onebot.v11.exception import ActionFailed
@@ -17,15 +21,17 @@ from utils.message_builder import image
 from .json_util import *
 from models.bag_user import BagUser
 from .imitate import imitate, sel_card
+get_url = 'https://honkai-card-honkai-card-rhbdvhegec.cn-hangzhou.fcapp.run/get_data'
+post_url = 'https://honkai-card-honkai-card-rhbdvhegec.cn-hangzhou.fcapp.run/send_data'
 group_hook = {}
 wait_time = 360
-
 __zx_plugin_name__ = "模拟模拟宇宙"
 __plugin_usage__ = f"""
 usage:
     卡bug 发送 崩三卡牌强制刷新
-    发送模拟 崩三卡牌 挑选完进入等待时间{wait_time}s(60s配置时间在内),时间到无第二个人将进入人机对战, 一个群同时只有一场对战,战斗结果展示前16场和结束前16场,角色随机发放,绑定对应体系卡组
-    人人对战输赢伤害皆录入排行,发送崩三卡牌总伤害排行榜,可查看前10排名,一周刷新一次,按照排行每天晚上进行奖励发放,
+    发送模拟 崩三卡牌 挑选完进入等待时间{wait_time}s(60s配置时间在内),时间到无第二个人将进入人机对战, 一个群同时只有一场对战,角色随机发放,绑定对应体系卡组
+    人人对战输赢伤害皆录入排行,发送崩三卡牌排行榜,可查看前10排名,一周刷新一次,按照排行每天晚上进行奖励发放,
+    发送崩三卡牌排行榜云端 可查看前50名总体排行 ，伤害数据每晚上传云数据库，只传前10名，
 """.strip()
 __plugin_des__ = "崩三卡牌"
 __plugin_cmd__ = ["崩三卡牌", "崩三卡牌排行榜", "崩三卡牌强制刷新"]
@@ -84,7 +90,22 @@ async def _(bot:Bot, event: GroupMessageEvent):
     data = read_json_file(record_dir)
     group = str(event.group_id)
     if "排行榜" in text:
-        rank_image = await init_rank("崩三卡牌总伤害排行榜", [int(item) for item in list(data[group]["rank"].keys())], list(data[group]["rank"].values()),group, 10)
+        if "云端" in text:
+            cloud_data = []
+            for i in range(3):
+                try:
+                    cloud_data =  AsyncHttpx.get(get_url + "?n=50",timeout = 15).json()
+                    break
+                except:
+                    await asyncio.sleep(3)
+            if len(cloud_data) == 0:
+                await honkai_card.finish("暂时无法获取云端排行")
+            else:
+                _uname_lst = [i["user_name"] for i in cloud_data]
+                _num_lst = [i["harm"] for i in cloud_data]
+            rank_image = await asyncio.get_event_loop().run_in_executor(None, _init_rank_graph, "崩三卡牌总伤害云端排行榜", _uname_lst, _num_lst)
+        else:
+            rank_image = await init_rank("崩三卡牌总伤害排行榜", [int(item) for item in list(data[group]["rank"].keys())], list(data[group]["rank"].values()),group, 10)
         if rank_image:
             await honkai_card.finish(image(b64=rank_image.pic2bs4()))
     elif "强制刷新" in text:
@@ -163,7 +184,19 @@ async def fighting(bot:Bot, event:GroupMessageEvent):
         await asyncio.sleep(1)
                   
         
-
+async def get_nickname(user_id: int, group_id: int = None):
+    bot = get_bot()
+    
+    if group_id is None:
+        # 获取陌生人信息
+        stranger_info = await bot.get_stranger_info(user_id=user_id)
+        nickname = stranger_info['nickname']
+    else:
+        # 获取群组成员信息
+        member_info = await bot.get_group_member_info(user_id=user_id, group_id=group_id)
+        nickname = member_info['card'] if member_info['card'] else member_info['nickname']
+    
+    return nickname
 
 
 
@@ -182,6 +215,7 @@ async def _():
 )
 async def _():
     data = read_json_file(record_dir)
+    data_send = []
     for i in data:
         gold_add = 150
         for j in data[i]["rank"]:
@@ -189,5 +223,27 @@ async def _():
             id = int(j)
             await BagUser.add_gold(id, group, gold_add)
             gold_add -= 10
-            
+            try:
+                nickname = await get_nickname(int(j), int(i))
+                data_send.append({"user_name": nickname, 'group_id': i, 'uid': j, "harm": data[i]["rank"][j]})
+            except:
+                pass
+    time_delay = random.randint(0, 3500)
+    count = 0
+    while count < time_delay:
+        count += 1
+        await asyncio.sleep(1)
+        
+    try_count = 0
+    while try_count < 4:
+        try:
+            if len(data_send) > 0:
+                await AsyncHttpx.post(post_url, data=data_send)
+            break
+        except:
+            try_count += 1
+            await asyncio.sleep(10)
+    
+        
+
             
