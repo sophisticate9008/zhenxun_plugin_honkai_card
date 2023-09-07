@@ -32,6 +32,7 @@ usage:
     发送模拟 崩三卡牌 挑选完进入等待时间{wait_time}s(60s配置时间在内),时间到无第二个人将进入人机对战, 一个群同时只有一场对战,角色随机发放,绑定对应体系卡组
     人人对战输赢伤害皆录入排行,发送崩三卡牌排行榜,可查看前10排名,一周刷新一次,按照排行每天晚上进行奖励发放,
     发送崩三卡牌排行榜云端 可查看前50名总体排行 ，伤害数据每晚上传云数据库，只传前10名，
+    发送崩三卡牌上传数据，可立刻上传数据
 """.strip()
 __plugin_des__ = "崩三卡牌"
 __plugin_cmd__ = ["崩三卡牌", "崩三卡牌排行榜", "崩三卡牌强制刷新"]
@@ -104,6 +105,8 @@ async def _(bot:Bot, event: GroupMessageEvent):
             else:
                 _uname_lst = [i["user_name"] for i in cloud_data]
                 _num_lst = [i["harm"] for i in cloud_data]
+                _uname_lst.reverse()
+                _num_lst.reverse()
             rank_image = await asyncio.get_event_loop().run_in_executor(None, _init_rank_graph, "崩三卡牌总伤害云端排行榜", _uname_lst, _num_lst)
         else:
             rank_image = await init_rank("崩三卡牌总伤害排行榜", [int(item) for item in list(data[group]["rank"].keys())], list(data[group]["rank"].values()),group, 10)
@@ -111,6 +114,8 @@ async def _(bot:Bot, event: GroupMessageEvent):
             await honkai_card.finish(image(b64=rank_image.pic2bs4()))
     elif "强制刷新" in text:
         group_hook[group] = {}
+    elif "上传" in text:  
+        await honkai_card.send(await upload())
     else:
         if group_hook.get(group):
             if group_hook[group][0]["block"]:
@@ -226,7 +231,7 @@ async def _():
             gold_add -= 10
             try:
                 nickname = await get_nickname(int(j), int(i))
-                data_send.append({"user_name": nickname, 'group_id': i, 'uid': j, "harm": data[i]["rank"][j]})
+                data_send.append({"user_name": nickname, 'group_id': i, 'uid': j, "harm": int(data[i]["rank"][j])})
             except:
                 pass
     time_delay = random.randint(0, 3500)
@@ -240,12 +245,34 @@ async def _():
         try:
             if len(data_send) > 0:
                 await AsyncHttpx.post(post_url, data=data_send)
-                
             break
         except:
             try_count += 1
             await asyncio.sleep(10)
     
-        
+async def upload():
+    data = read_json_file(record_dir)
+    data_send = []
+    for i in data:
+        for j in data[i]["rank"]:
+            try:
+                nickname = await get_nickname(int(j), int(i))
+                data_send.append({"user_name": nickname, 'group_id': i, 'uid': j, "harm": int(data[i]["rank"][j])})
+            except:
+                pass
+    try_count = 0
+    while try_count < 6:
+        try:
+            if len(data_send) > 0:
+                result = await AsyncHttpx.post(post_url, json=data_send)
+                if result.status_code == 200:
+                    return result.text
+                else:
+                    return "上传失败"
+            else:
+                return "无数据可上传"
+        except:
+            try_count += 1
+            await asyncio.sleep(10)    
 
             
