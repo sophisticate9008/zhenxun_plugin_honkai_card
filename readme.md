@@ -1,4 +1,5 @@
 打开__init__.py看使用说明
+云端数据库采用免费数据库memfiredb: https://docs.memfiredb.com/和阿里云函数封装
 
 没人玩
 
